@@ -109,18 +109,24 @@ def merge_base(audio, image, path, overwrite=False):
         # merge
         length = int(ceil(get_audio_length(audio))+2)
         args = ['ffmpeg', '-y', '-r', '1/%i'%length, '-i', image, '-i', audio,
-                '-vf', 'fps=25,format=yuv420p', video_path]
-        print(' '.join(args))
-        process = subprocess.Popen(args,
-                                   stdout = subprocess.PIPE,
-                                   stderr = subprocess.PIPE)
-        stdout, stderr = process.communicate()
-        print(stdout)
-        print(stderr.decode())
+                '-vf', 'fps=25,format=yuv420p', 'dummy.mp4']
+        run(args)
         # add fadein
+        args = ['ffmpeg', '-y', '-i', 'dummy.mp4', '-vf', 'fade=t=in:st=0:d=1.5',
+                '-c:a', 'copy', 'dummy2.mp4']
+        run(args)
         # add fadeout
+        args = ['ffmpeg', '-y', '-i', 'dummy2.mp4', '-vf', 'fade=t=out:st=4:d=0.5',
+                '-c:a', 'copy', video_path]
+        run(args)
     else:
         print('skipping merge')
+
+def run(args):
+    print(' '.join(args))
+    process = subprocess.Popen(args, stdout = subprocess.PIPE,
+                                     stderr = subprocess.PIPE)
+    stdout, stderr = process.communicate()
 
 def get_audio_length(audio):
     return 4.1
