@@ -4,6 +4,7 @@ import re
 import Levenshtein as lv
 import subprocess
 from bs4 import BeautifulSoup as bs4
+from math import ceil
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -86,7 +87,7 @@ def download_merge():
         image_path = save('image', image)
         print(audio, image)
         print('** merging')
-        merge(audio_path, image_path, 'video')
+        merge_base(audio_path, image_path, 'video')
 
 def create_dir(name):
     if not os.path.exists(name):
@@ -102,15 +103,27 @@ def save(path, url):
         print('skipping %s'%filepath)
     return filepath
 
-def merge(audio, image, path):
-    video_path = os.path.join(path, os.path.basename(audio))[:-3]+'flv'
-    if not os.path.isfile(video_path):
-        args = ['ffmpeg', '-i', image, '-i', audio, video_path]
+def merge_base(audio, image, path, overwrite=False):
+    video_path = os.path.join(path, os.path.basename(audio))[:-3]+'mp4'
+    if not os.path.isfile(video_path) or not overwrite:
+        # merge
+        length = int(ceil(get_audio_length(audio))+2)
+        args = ['ffmpeg', '-y', '-r', '1/%i'%length, '-i', image, '-i', audio,
+                '-vf', 'fps=25,format=yuv420p', video_path]
         print(' '.join(args))
         process = subprocess.Popen(args,
                                    stdout = subprocess.PIPE,
                                    stderr = subprocess.PIPE)
         stdout, stderr = process.communicate()
+        print(stdout)
+        print(stderr.decode())
+        # add fadein
+        # add fadeout
+    else:
+        print('skipping merge')
+
+def get_audio_length(audio):
+    return 4.1
 
 if __name__ == "__main__":
     main()
