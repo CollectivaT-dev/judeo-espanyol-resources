@@ -87,7 +87,8 @@ def download_merge():
         image_path = save('image', image)
         print(audio, image)
         print('** merging')
-        merge_base(audio_path, image_path, 'video')
+        video_path = merge_base(audio_path, image_path, 'video')
+        merge_intro_outro(video_path)
 
 def create_dir(name):
     if not os.path.exists(name):
@@ -105,7 +106,8 @@ def save(path, url):
 
 def merge_base(audio, image, path, overwrite=False):
     video_path = os.path.join(path, os.path.basename(audio))[:-3]+'mp4'
-    if not os.path.isfile(video_path) or not overwrite:
+    print(video_path)
+    if not os.path.isfile(video_path) and not overwrite:
         # merge
         length = int(ceil(get_audio_length(audio))+2)
         args = ['ffmpeg', '-y', '-r', '1/%i'%length, '-i', image, '-i', audio,
@@ -116,20 +118,41 @@ def merge_base(audio, image, path, overwrite=False):
                 '-c:a', 'copy', 'dummy2.mp4']
         run(args)
         # add fadeout
-        args = ['ffmpeg', '-y', '-i', 'dummy2.mp4', '-vf', 'fade=t=out:st=4:d=0.5',
+        fadeout_start = length - 0.5
+        args = ['ffmpeg', '-y', '-i', 'dummy2.mp4', '-vf',
+                'fade=t=out:st=%2.1f:d=0.5'%fadeout_start,
                 '-c:a', 'copy', video_path]
         run(args)
     else:
         print('skipping merge')
+    return video_path
 
 def run(args):
     print(' '.join(args))
     process = subprocess.Popen(args, stdout = subprocess.PIPE,
                                      stderr = subprocess.PIPE)
     stdout, stderr = process.communicate()
+    return stdout, stderr
 
 def get_audio_length(audio):
-    return 4.1
+    args = 'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1'.split()+[audio]
+    process = subprocess.Popen(args, stdout = subprocess.PIPE,
+                                     stderr = subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    duration = stdout.decode()
+    print(duration)
+    return float(duration)
+
+def merge_intro_outro(video_path, overwrite=False):
+    intro_path = os.path.join(PATH, '../video', 'intro.mp4')
+    video_io_path = video_path.replace('.mp4', '_io.mp4')
+    if not os.path.isfile(video_io_path) and not overwrite:
+        args = ['ffmpeg', '-y', '-i', intro_path, '-i', video_path, '-f', 'lavfi',
+                '-t', '1', '-i', 'anullsrc', '-filter_complex', '[0:v][2:a][1:v][1:a]concat=n=2:v=1:a=1[v][a]', '-map', "[v]", '-map', "[a]", 'dummy3.mp4']
+        stdout, stderr = run(args)
+        args = ['ffmpeg', '-y', '-i', 'dummy3.mp4', '-i', intro_path, '-f', 'lavfi',
+                '-t', '1', '-i', 'anullsrc', '-filter_complex', '[0:v][0:a][1:v][2:a]concat=n=2:v=1:a=1[v][a]', '-map', "[v]", '-map', "[a]", video_io_path]
+        stdout, stderr = run(args)
 
 if __name__ == "__main__":
     main()
