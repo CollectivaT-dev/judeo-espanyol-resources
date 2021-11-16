@@ -2,11 +2,16 @@ import requests
 import os
 import re
 import Levenshtein as lv
+import subprocess
 from bs4 import BeautifulSoup as bs4
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 
 def main():
+    #scrape()
+    download_merge()
+
+def scrape():
     url = "https://sefarad.com.tr/judeo-espanyolladino/frazadeldia/"
     res = requests.get(url)
     soup = bs4(res.content, 'html.parser')
@@ -69,6 +74,43 @@ def get_rest(audios, imgs, audio_img):
                 audio_img.append((audio, img))
                 imgs.pop(i)
                 break
+
+def download_merge():
+    filepath = os.path.join(PATH, '../resources/', 'audio_img.csv')
+    ai = [line.strip().split(',') for line in open(filepath).readlines()]
+    create_dir('audio')
+    create_dir('image')
+    create_dir('video')
+    for audio, image in ai:
+        audio_path = save('audio', audio)
+        image_path = save('image', image)
+        print(audio, image)
+        print('** merging')
+        merge(audio_path, image_path, 'video')
+
+def create_dir(name):
+    if not os.path.exists(name):
+        os.mkdir(name)
+
+def save(path, url):
+    filepath = os.path.join(path, os.path.basename(url))
+    if not os.path.isfile(filepath):
+        r = requests.get(url)
+        with open(filepath, 'wb') as f:
+            f.write(r.content)
+    else:
+        print('skipping %s'%filepath)
+    return filepath
+
+def merge(audio, image, path):
+    video_path = os.path.join(path, os.path.basename(audio))[:-3]+'flv'
+    if not os.path.isfile(video_path):
+        args = ['ffmpeg', '-i', image, '-i', audio, video_path]
+        print(' '.join(args))
+        process = subprocess.Popen(args,
+                                   stdout = subprocess.PIPE,
+                                   stderr = subprocess.PIPE)
+        stdout, stderr = process.communicate()
 
 if __name__ == "__main__":
     main()
