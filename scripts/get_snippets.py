@@ -87,8 +87,8 @@ def download_merge():
         image_path = save('image', image)
         print(audio, image)
         print('** merging')
-        video_path = merge_base(audio_path, image_path, 'video')
-        merge_intro_outro(video_path)
+        video_path = merge_base(audio_path, image_path, 'video', w_fadein=False)
+        merge_intro_outro(video_path, w_intro=False)
 
 def create_dir(name):
     if not os.path.exists(name):
@@ -104,8 +104,12 @@ def save(path, url):
         print('skipping %s'%filepath)
     return filepath
 
-def merge_base(audio, image, path, overwrite=False):
-    video_path = os.path.join(path, os.path.basename(audio))[:-3]+'mp4'
+def merge_base(audio, image, path, overwrite=False, w_fadein=True):
+    if w_fadein:
+        extension = '.mp4'
+    else:
+        extension = '_f.mp4'
+    video_path = os.path.join(path, os.path.basename(audio))[:-4]+extension
     print(video_path)
     if not os.path.isfile(video_path) and not overwrite:
         # merge
@@ -113,13 +117,18 @@ def merge_base(audio, image, path, overwrite=False):
         args = ['ffmpeg', '-y', '-r', '1/%i'%length, '-i', image, '-i', audio,
                 '-vf', 'fps=25,format=yuv420p', 'dummy.mp4']
         run(args)
-        # add fadein
-        args = ['ffmpeg', '-y', '-i', 'dummy.mp4', '-vf', 'fade=t=in:st=0:d=1.5',
-                '-c:a', 'copy', 'dummy2.mp4']
-        run(args)
+        # parameters for the case wo_fadein, which are overwritten if w_fadein
+        infile = 'dummy.mp4'
+        if w_fadein:
+            outfile = 'dummy2.mp4'
+            # add fadein
+            args = ['ffmpeg', '-y', '-i', infile, '-vf', 'fade=t=in:st=0:d=1.5',
+                    '-c:a', 'copy', outfile]
+            run(args)
+            infile = 'dummy2.mp4'
         # add fadeout
         fadeout_start = length - 0.5
-        args = ['ffmpeg', '-y', '-i', 'dummy2.mp4', '-vf',
+        args = ['ffmpeg', '-y', '-i', infile, '-vf',
                 'fade=t=out:st=%2.1f:d=0.5'%fadeout_start,
                 '-c:a', 'copy', video_path]
         run(args)
@@ -143,15 +152,28 @@ def get_audio_length(audio):
     print(duration)
     return float(duration)
 
-def merge_intro_outro(video_path, overwrite=False):
+def merge_intro_outro(video_path, overwrite=False, w_intro=True):
     intro_path = os.path.join(PATH, '../video', 'intro.mp4')
-    video_io_path = video_path.replace('.mp4', '_io.mp4')
+    if w_intro:
+        extension = '_io.mp4'
+    else:
+        extension = '_o.mp4'
+    video_io_path = video_path.replace('.mp4', extension)
     if not os.path.isfile(video_io_path) and not overwrite:
-        args = ['ffmpeg', '-y', '-i', intro_path, '-i', video_path, '-f', 'lavfi',
-                '-t', '1', '-i', 'anullsrc', '-filter_complex', '[0:v][2:a][1:v][1:a]concat=n=2:v=1:a=1[v][a]', '-map', "[v]", '-map', "[a]", 'dummy3.mp4']
-        stdout, stderr = run(args)
-        args = ['ffmpeg', '-y', '-i', 'dummy3.mp4', '-i', intro_path, '-f', 'lavfi',
-                '-t', '1', '-i', 'anullsrc', '-filter_complex', '[0:v][0:a][1:v][2:a]concat=n=2:v=1:a=1[v][a]', '-map', "[v]", '-map', "[a]", video_io_path]
+        # this is case wo_intro that is overwritten in w_intro = True
+        infile = video_path
+        if w_intro:
+            outfile = 'dummy3.mp4'
+            args = ['ffmpeg', '-y', '-i', intro_path, '-i', infile, '-f', 'lavfi',
+                    '-t', '1', '-i', 'anullsrc', '-filter_complex',
+                    '[0:v][2:a][1:v][1:a]concat=n=2:v=1:a=1[v][a]',
+                    '-map', "[v]", '-map', "[a]", outfile]
+            stdout, stderr = run(args)
+            infile = 'dummy3.mp4'
+        args = ['ffmpeg', '-y', '-i', infile, '-i', intro_path, '-f', 'lavfi',
+                '-t', '1', '-i', 'anullsrc', '-filter_complex',
+                '[0:v][0:a][1:v][2:a]concat=n=2:v=1:a=1[v][a]',
+                '-map', "[v]", '-map', "[a]", video_io_path]
         stdout, stderr = run(args)
 
 if __name__ == "__main__":
