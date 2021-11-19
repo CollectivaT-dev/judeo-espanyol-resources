@@ -79,12 +79,14 @@ def get_rest(audios, imgs, audio_img):
 def download_merge():
     filepath = os.path.join(PATH, '../resources/', 'audio_img.csv')
     ai = [line.strip().split(',') for line in open(filepath).readlines()]
+    #TODO parametrize dir names to propagate later
     create_dir('audio')
     create_dir('image')
     create_dir('video')
     for audio, image in ai:
         audio_path = save('audio', audio)
         image_path = save('image', image)
+        image_path = fix_image(image_path)
         print(audio, image)
         print('** merging')
         video_path = merge_base(audio_path, image_path, 'video', w_fadein=False)
@@ -103,6 +105,13 @@ def save(path, url):
     else:
         print('skipping %s'%filepath)
     return filepath
+
+def fix_image(path):
+    patch_path = os.path.join(PATH, '../assets/', 'patch.jpeg')
+    new_path = path.replace('.jpeg', '_cl.jpeg')
+    args = ['composite',  '-geometry', '+0+0', patch_path, path, new_path]
+    stdout, stderr = run(args)
+    return new_path
 
 def merge_base(audio, image, path, overwrite=False, w_fadein=True):
     if w_fadein:
@@ -153,7 +162,7 @@ def get_audio_length(audio):
     return float(duration)
 
 def merge_intro_outro(video_path, overwrite=False, w_intro=True):
-    intro_path = os.path.join(PATH, '../video', 'intro.mp4')
+    intro_path = os.path.join(PATH, '../assets', 'intro.mp4')
     if w_intro:
         extension = '_io.mp4'
     else:
