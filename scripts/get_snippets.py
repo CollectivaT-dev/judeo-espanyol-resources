@@ -10,7 +10,7 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 
 def main():
     #scrape()
-    download_merge()
+    download_merge(intro_frame=True)
 
 def scrape():
     url = "https://sefarad.com.tr/judeo-espanyolladino/frazadeldia/"
@@ -76,7 +76,7 @@ def get_rest(audios, imgs, audio_img):
                 imgs.pop(i)
                 break
 
-def download_merge():
+def download_merge(intro_frame=False):
     filepath = os.path.join(PATH, '../resources/', 'audio_img.csv')
     ai = [line.strip().split(',') for line in open(filepath).readlines()]
     #TODO parametrize dir names to propagate later
@@ -89,8 +89,11 @@ def download_merge():
         image_path = fix_image(image_path)
         print(audio, image)
         print('** merging')
-        video_path = merge_base(audio_path, image_path, 'video', w_fadein=False)
-        merge_intro_outro(video_path, w_intro=False)
+        video_path = merge_base(audio_path, image_path, 'video', w_fadein=True)
+        video_path = merge_intro_outro(video_path, w_outro=False)
+        if intro_frame:
+            print('** adding single frame')
+            put_intro_frame(image_path, video_path)
 
 def create_dir(name):
     if not os.path.exists(name):
@@ -109,8 +112,9 @@ def save(path, url):
 def fix_image(path):
     patch_path = os.path.join(PATH, '../assets/', 'patch.jpeg')
     new_path = path.replace('.jpeg', '_cl.jpeg')
-    args = ['composite',  '-geometry', '+0+0', patch_path, path, new_path]
-    stdout, stderr = run(args)
+    if not os.path.isfile(new_path):
+        args = ['composite',  '-geometry', '+0+0', patch_path, path, new_path]
+        stdout, stderr = run(args)
     return new_path
 
 def merge_base(audio, image, path, overwrite=False, w_fadein=True):
@@ -161,29 +165,45 @@ def get_audio_length(audio):
     print(duration)
     return float(duration)
 
-def merge_intro_outro(video_path, overwrite=False, w_intro=True):
+def merge_intro_outro(video_path, overwrite=False, w_outro=True):
     intro_path = os.path.join(PATH, '../assets', 'intro.mp4')
-    if w_intro:
-        extension = '_io.mp4'
-    else:
+    if w_outro:
         extension = '_o.mp4'
+    else:
+        extension = '_io.mp4'
     video_io_path = video_path.replace('.mp4', extension)
     if not os.path.isfile(video_io_path) and not overwrite:
         # this is case wo_intro that is overwritten in w_intro = True
         infile = video_path
-        if w_intro:
-            outfile = 'dummy3.mp4'
-            args = ['ffmpeg', '-y', '-i', intro_path, '-i', infile, '-f', 'lavfi',
-                    '-t', '1', '-i', 'anullsrc', '-filter_complex',
-                    '[0:v][2:a][1:v][1:a]concat=n=2:v=1:a=1[v][a]',
-                    '-map', "[v]", '-map', "[a]", outfile]
-            stdout, stderr = run(args)
-            infile = 'dummy3.mp4'
-        args = ['ffmpeg', '-y', '-i', infile, '-i', intro_path, '-f', 'lavfi',
+        outfile = 'dummy3.mp4'
+        args = ['ffmpeg', '-y', '-i', intro_path, '-i', infile, '-f', 'lavfi',
                 '-t', '1', '-i', 'anullsrc', '-filter_complex',
-                '[0:v][0:a][1:v][2:a]concat=n=2:v=1:a=1[v][a]',
-                '-map', "[v]", '-map', "[a]", video_io_path]
+                '[0:v][2:a][1:v][1:a]concat=n=2:v=1:a=1[v][a]',
+                '-map', "[v]", '-map', "[a]", outfile]
         stdout, stderr = run(args)
+        if w_outro:
+            infile = 'dummy3.mp4'
+            args = ['ffmpeg', '-y', '-i', infile, '-i', intro_path, '-f', 'lavfi',
+                    '-t', '1', '-i', 'anullsrc', '-filter_complex',
+                    '[0:v][0:a][1:v][2:a]concat=n=2:v=1:a=1[v][a]',
+                    '-map', "[v]", '-map', "[a]", video_io_path]
+            stdout, stderr = run(args)
+        else:
+            args = ['mv', outfile, video_io_path]
+            stdout, stderr = run(args)
+    return video_io_path
+
+def put_intro_frame(image, video_path):
+    intro_frame_path = 'single_frame.mp4'
+    video_out = video_path.replace('.mp4','_wf.mp4')
+    if not os.path.isfile(video_out):
+        # create single frame video
+        args = ['ffmpeg', '-y', '-r', '1/0.04', '-i', image, '-vf', 
+                'fps=25,format=yuv420p', intro_frame_path]
+        run(args)
+        # merge video with single frame
+        args = ['ffmpeg', '-y', '-i', intro_frame_path, '-i', video_path, '-f', 'lavfi', '-t', '0.04', '-i', 'anullsrc', '-filter_complex', '[0:v][2:a][1:v][1:a]concat=n=2:v=1:a=1[v][a]', '-map', '[v]', '-map', '[a]', video_out]
+        run(args)
 
 if __name__ == "__main__":
     main()
