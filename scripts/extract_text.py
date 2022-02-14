@@ -33,4 +33,5 @@ with open(os.path.join(PATH, '../resources/transcripts.csv'), 'w') as out:
         image = r[0].replace('_cl.txt','.jpeg')
         out.write('%s,%s,"%s"\n'%(image, ai_dict[image], r[1]))
     for r in non_results:
-        out.write('%s,%s,""\n'%(r.replace('_cl.txt','.jpeg'), ai_dict[image])
+        image = r.replace('_cl.txt','.jpeg')
+        out.write('%s,%s,""\n'%(image, ai_dict[image]))
