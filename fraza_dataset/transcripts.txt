@@ -263,7 +263,7 @@ fraza_dataset/wav/80-un-hazan.wav|Un hazan es el ke kanta i dirije las orasiones
 fraza_dataset/wav/81-una-rubisa.wav|Una rubisa es la mujer del haham. Una rubisa es la mujer del haham.
 fraza_dataset/wav/82-una-nikochera.wav|Una nikochera es una mujer de kaza kumplida. Una nikochera es una mujer de kaza kumplida.
 fraza_dataset/wav/83-un-shastre.wav|Un shastre kuze vistidos para ombres. Un shastre kuze vistidos para ombres.
-fraza_dataset/wav/84-sara-i-moshe-estan-flörtando.wav|Sara i Moshe estan flortando. Sara i Moshe estan flortando.
+fraza_dataset/wav/84-sara-i-moshe-estan-flörtando.wav|Sara i Moshe estan flörtando. Sara i Moshe estan flörtando.
 fraza_dataset/wav/85-moshe-le-traye-una-roza.wav|Moshe le traye una roza a Sara kada dia. Moshe le traye una roza a Sara kada dia.
 fraza_dataset/wav/86-sara-le-aze-un-kave.wav|Sara le aze un kave kuando Moshe viene. Sara le aze un kave kuando Moshe viene.
 fraza_dataset/wav/87-a-sara-i-moshe-les-plaze-ir-al-sinema.wav|A Sara i Moshe les plaze ir al sinema. A Sara i Moshe les plaze ir al sinema.
