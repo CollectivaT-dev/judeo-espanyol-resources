@@ -13,7 +13,7 @@ def main():
     download_merge(intro_frame=True)
 
 def scrape():
-    url = "https://sefarad.com.tr/judeo-espanyolladino/frazadeldia/"
+    url = "https://sefarad.com.tr/es/"
     res = requests.get(url)
     soup = bs4(res.content, 'html.parser')
 
