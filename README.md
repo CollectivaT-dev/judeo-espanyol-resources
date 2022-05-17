@@ -18,3 +18,6 @@ In order to introduce the data into Coqui TTS, the transcript file has to be pre
 ```
 awk -F'\t' '{print $2"\t"$3,$3}' resources/transcripts_edited.csv | sed 's/\.ogg/\.wav/g; s|^|fraza_dataset/wav/|g; s/\t/|/g' > fraza_dataset/transcripts.txt
 ```
+## Salom newspaper scraping scripts
+
+IPython notebooks for scraping ladino articles from [Salom newspaper](https://www.salom.com.tr/) are provided in [notebooks/scraping.ipynb](https://github.com/CollectivaT-dev/judeo-espanyol-resources/blob/main/notebooks/scraping.ipynb)
