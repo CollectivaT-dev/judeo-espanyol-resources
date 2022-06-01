@@ -6,8 +6,8 @@ RE_JE = re.compile('(?<=(FRASE AL DIA\s\s))(.|\s)*?(?=\s\s)')
 
 results = []
 non_results = []
-txt_path = os.path.join(PATH,'../txts_full')
-ref_path = os.path.join(PATH, '../resources/', 'audio_img.csv')
+txt_path = os.path.join(PATH,'../resources/multimedia/sefarad.com.tr/txts_full')
+ref_path = os.path.join(PATH, '../resources/multimedia/sefarad.com.tr/', 'sefarad.com.tr.csv')
 ai = [line.strip().split(',') for line in open(ref_path).readlines()]
 ai_dict = {os.path.basename(i): os.path.basename(a) for a,i in ai}
 for f in os.listdir(txt_path):
@@ -28,7 +28,7 @@ for f in os.listdir(txt_path):
             else:
                 non_results.append(f)
 
-with open(os.path.join(PATH, '../resources/transcripts.csv'), 'w') as out:
+with open(os.path.join(PATH, '../resources/multimedia/sefarad.com.tr/transcripts.csv'), 'w') as out:
     for r in results:
         image = r[0].replace('_cl.txt','.jpeg')
         out.write('%s,%s,"%s"\n'%(image, ai_dict[image], r[1]))
