@@ -1,3 +1,6 @@
+<p align="center"><img src="https://raw.githubusercontent.com/CollectivaT-dev/Espanyol-Ladino-Translation/master/img/ab-tr.jpg"></p>
+
+
 # Judeo-Espanyol Resources
 
 Welcome to the Judeo-Spanish (Ladino) resource repository where you can find texts, dictionaries and other tools to create datasets for the Judeo-Spanish language.
