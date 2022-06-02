@@ -2,7 +2,7 @@
 
 # Judeo-Espanyol Resources
 
-Welcome to the Judeo-Spanish (Ladino) resource repository where you can find texts, dictionaries and other tools to create datasets for the Judeo-Spanish language.
+Welcome to the Judeo-Spanish (Ladino) resource repository where you can find texts, dictionaries and other tools to create datasets and tools for the Judeo-Spanish language.
 
 # Installation
 
