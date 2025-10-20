@@ -6,6 +6,8 @@ Welcome to the Judeo-Spanish (Ladino) resource repository where you can find som
 
 You can find data and models in [Col·lectivaT's Hugging Face collection](https://huggingface.co/collections/collectivat/ladino-data-hub-68e3ea984627ccf32a78f340). 
 
+See also rule-based [Spanish-Ladino translator](https://github.com/CollectivaT-dev/Espanyol-Ladino-Translation). 
+
 # Installation
 
 In order to clone this repository:
