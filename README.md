@@ -2,7 +2,9 @@
 
 # Judeo-Espanyol Resources
 
-Welcome to the Judeo-Spanish (Ladino) resource repository where you can find texts, dictionaries and other tools to create datasets and tools for the Judeo-Spanish language.
+Welcome to the Judeo-Spanish (Ladino) resource repository where you can find some of the scripts and other tools to create datasets and tools for the Judeo-Spanish language.
+
+You can find data and models in [Col·lectivaT's Hugging Face collection](https://huggingface.co/collections/collectivat/ladino-data-hub-68e3ea984627ccf32a78f340). 
 
 # Installation
 
@@ -48,6 +50,8 @@ You can find the development, test sets used in the training of neural machine t
 
 # Citation
 
+[Preparing an Endangered Language for the Digital Age: The Case of Judeo-Spanish](https://aclanthology.org/2022.eurali-1.18/)
+
 ```
 Alp Öktem, Rodolfo Zevallos, Yasmin Moslem, Güneş Öztürk, Karen Şarhon. 
 Preparing an endangered language for the digital age: The Case of Judeo-Spanish. 
@@ -58,5 +62,5 @@ Workshop on Resources and Technologies for Indigenous, Endangered and Lesser-res
 
 <p align="center"><img src="https://raw.githubusercontent.com/CollectivaT-dev/judeo-espanyol-resources/main/img/logos.png"></p>
 
-This repo is developed as part of project "Judeo-Spanish: Connecting the two ends of the Mediterranean" carried out by Col·lectivaT and Sephardic Center of Istanbul within the framework of the “Grant Scheme for Common Cultural Heritage: Preservation and Dialogue between Turkey and the EU–II (CCH-II)” implemented by the Ministry of Culture and Tourism of the Republic of Turkey with the financial support of the European Union. The content of this website is the sole responsibility of Col·lectivaT and does not necessarily reflect the views of the European Union. 
+This repository is developed as part of project "Judeo-Spanish: Connecting the two ends of the Mediterranean" carried out by Col·lectivaT and Sephardic Center of Istanbul within the framework of the “Grant Scheme for Common Cultural Heritage: Preservation and Dialogue between Turkey and the EU–II (CCH-II)” implemented by the Ministry of Culture and Tourism of the Republic of Turkey with the financial support of the European Union. The content of this website is the sole responsibility of Col·lectivaT and does not necessarily reflect the views of the European Union. 
 
